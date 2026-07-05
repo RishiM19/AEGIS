@@ -2,7 +2,7 @@
 
 **Document ID:** AEGIS-AGENTS
 **Status:** Canonical
-**Audience:** Any AI coding agent (Claude Code, Codex, or otherwise) operating in this repository
+**Audience:** Any AI coding agent or automated contributor operating in this repository
 **Depends On:** None — this is the entry point
 
 ---

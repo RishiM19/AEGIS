@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { requiresNewAgentVersion } from "../src/agent-types.js";
 
 const base = {
-  modelIdentifier: "anthropic",
-  modelVersion: "claude-sonnet-5",
+  modelIdentifier: "provider-a",
+  modelVersion: "model-v3",
   systemPromptHash: "sha_prompt_v1",
   toolConfigurationHash: "sha_tools_v1",
 };
@@ -14,7 +14,7 @@ test("identical configuration does not require a new version", () => {
 });
 
 test("model version change requires a new version (RefundAgent v3 vs v4, SPEC-002 SS5.3)", () => {
-  assert.equal(requiresNewAgentVersion(base, { ...base, modelVersion: "claude-opus-5" }), true);
+  assert.equal(requiresNewAgentVersion(base, { ...base, modelVersion: "model-v4" }), true);
 });
 
 test("system prompt change requires a new version", () => {
