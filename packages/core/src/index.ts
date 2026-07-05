@@ -14,3 +14,5 @@ export * from "./sentinel/runtime-sentinel.js";
 export * from "./recovery/recovery-engine.js";
 export * from "./approval/approval-coordinator.js";
 export * from "./learning/learning-plane.js";
+export * from "./delegation/delegation-graph.js";
+export * from "./integrity/evidence-integrity.js";
