@@ -21,6 +21,7 @@
 
 import type { CanonicalAction } from "@aegis/contracts";
 import type { Clock, IdSource } from "../kernel/clock.js";
+import type { EventLedger } from "../ledger/event-ledger.js";
 import type { AutonomyLevel } from "../assessment/levels.js";
 import { LEVEL_NAMES, minLevel } from "../assessment/levels.js";
 import type { CompetenceAssessment } from "../assessment/competence.js";
@@ -135,10 +136,14 @@ export interface DecisionInput {
   grantValiditySeconds: number;
 }
 
+const COMPONENT = "autonomy-decision-engine";
+const VERSIONS = { autonomyDecisionEngine: AUTONOMY_ALGORITHM_VERSION };
+
 export class AutonomyDecisionEngine {
   constructor(
     private readonly clock: Clock,
     private readonly ids: IdSource,
+    private readonly ledger?: EventLedger,
   ) {}
 
   decide(input: DecisionInput): AutonomyDecision {
@@ -214,6 +219,9 @@ export class AutonomyDecisionEngine {
 
     const grant = finalLevel === 0 ? null : this.issueGrant(input, delegation, finalLevel, now);
 
+    this.emit(input.tenantId, "AUTONOMY_DECIDED", [action.identity.actionId], { level: finalLevel, hardBlockers });
+    if (grant) this.emit(input.tenantId, "CONTRACT_CREATED", [action.identity.actionId, grant.grantId], { level: finalLevel });
+
     return {
       decisionId: this.ids.next("dec"),
       algorithmVersion: AUTONOMY_ALGORITHM_VERSION,
@@ -226,6 +234,18 @@ export class AutonomyDecisionEngine {
       decidedAt: now,
       grant,
     };
+  }
+
+  private emit(tenantId: string, eventType: string, subjectIds: string[], payload: Record<string, unknown>): void {
+    this.ledger?.append({
+      eventType,
+      owningSpec: "SPEC-007",
+      subjectIds,
+      payload,
+      tenantId,
+      versionsInEffect: VERSIONS,
+      sourceComponent: COMPONENT,
+    });
   }
 
   private matchDelegation(input: DecisionInput, now: string, hardBlockers: string[]): Delegation | null {
