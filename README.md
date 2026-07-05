@@ -3,7 +3,7 @@
 **Adaptive Autonomy Infrastructure for AI Agents**
 
 [![CI](https://github.com/RishiM19/AEGIS/actions/workflows/ci.yml/badge.svg)](https://github.com/RishiM19/AEGIS/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-139%20passing-34d399)](https://github.com/RishiM19/AEGIS/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-142%20passing-34d399)](https://github.com/RishiM19/AEGIS/actions/workflows/ci.yml)
 [![Live dashboard](https://img.shields.io/badge/live%20demo-aegis--dashboard-4da3ff)](https://aegis-dashboard-woad.vercel.app)
 
 Most AI-agent safety today is a static permission check: *is this identity allowed to call this tool?* AEGIS asks a harder question instead — *given this exact action, this agent's actual track record, how novel the situation is, how bad it could go, and whether it can be undone, how much independence should this agent get, right now?* It's the difference between a firewall rule and a judgment call, made automatically, consistently, and auditably, thousands of times a second.
@@ -17,7 +17,13 @@ Most AI-agent safety today is a static permission check: *is this identity allow
 ## What's actually implemented vs. designed
 
 - **Designed:** 19 full technical specifications (SPEC-000 → SPEC-018), each with domain objects, numbered invariants, failure behavior, security boundaries, and adversarial scenarios — see [`handbook/`](handbook/).
-- **Implemented:** every one of those specifications as real, tested TypeScript in [`packages/core`](packages/core) — Agent Registry, four independent assessment engines, the autonomy decision engine, execution gateway, runtime sentinel, recovery engine, approval coordinator, learning plane, delegation graph, anti-gaming detection, and a benchmark harness — 128 tests, all green, wired end-to-end in the live dashboard above.
+- **Implemented:** every one of those specifications as real, tested TypeScript in [`packages/core`](packages/core) — Agent Registry, four independent assessment engines, the autonomy decision engine, execution gateway, runtime sentinel, recovery engine, approval coordinator, learning plane, delegation graph, anti-gaming detection, a benchmark harness, and Postgres-backed persistence — 142 tests, all green, wired end-to-end in the live dashboard above.
+
+## Watch it detect and contain an incident
+
+Every step below is a real `RuntimeSentinel` evaluation against live signal readings — refund velocity climbing past each threshold, an `I4` pause firing at the dangerous threshold, an ineffective containment check correctly escalating to `I5` with the grant revoked, and a final confirmed containment. Nothing here is a scripted animation; click "Advance signal feed" yourself on the [live dashboard](https://aegis-dashboard-woad.vercel.app).
+
+<img src="docs/aegis-incident-demo.gif" alt="AEGIS Runtime Sentinel live incident demo: risk escalates from Normal through Dangerous, an I4 intervention fires, containment is reported ineffective and escalates to I5 with the grant revoked, then a final containment check succeeds" width="100%"/>
 
 ## Why this is hard
 
