@@ -96,8 +96,8 @@ function Scenario({ trace }: { trace: ScenarioTrace }) {
   );
 }
 
-export default function Page() {
-  const result = runBenchmarkSuite();
+export default async function Page() {
+  const result = await runBenchmarkSuite();
   const m = result.metrics;
   const baselineComparison = runBaselineComparison();
 
@@ -143,6 +143,36 @@ export default function Page() {
           <div className="value unavailable">{m.preventedExposureMinor}</div>
           <div className="label">Prevented exposure</div>
         </div>
+      </div>
+
+      <div className="persistence-note">
+        {result.persistence.configured ? (
+          <>
+            <span className="pill ok">
+              <span className="dot" />
+              persisted to Postgres
+            </span>
+            <span>
+              this run wrote <b>{result.persistence.persistedThisRun}</b> events (run <code>{result.persistence.runId.slice(0, 8)}</code>) ·{" "}
+              <b>{result.persistence.totalPersistedEvents ?? "?"}</b> events and <b>{result.persistence.totalPersistedAgents ?? "?"}</b> agents
+              recorded all-time, across every deployment
+            </span>
+            {result.persistence.recentRuns.length > 1 && (
+              <span>
+                · {result.persistence.recentRuns.length - 1} earlier run(s) still on record, most recent at{" "}
+                {result.persistence.recentRuns[1]?.lastEventAt}
+              </span>
+            )}
+          </>
+        ) : (
+          <>
+            <span className="pill neutral">
+              <span className="dot" />
+              in-memory only
+            </span>
+            <span>SUPABASE_URL / SUPABASE_KEY not configured — state resets every request. See handbook issue #19.</span>
+          </>
+        )}
       </div>
 
       <div className="section-title">Flagship refund benchmark — scenario traces</div>

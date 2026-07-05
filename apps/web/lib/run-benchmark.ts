@@ -23,7 +23,15 @@ import {
   type HistoricalActionRecord,
   type ResearchMetrics,
   type CeilingBreakdown,
+  persistEvents,
+  persistAgent,
+  totalPersistedEventCount,
+  totalPersistedAgentCount,
+  recentRuns,
+  isPersistenceConfigured,
+  type PersistedRunSummary,
 } from "@aegis/core";
+import { randomUUID } from "node:crypto";
 import { finalizeCanonicalAction, type CanonicalAction, type UnfingerprintedCanonicalAction } from "@aegis/contracts";
 
 export const REGION = "finance.refunds.customer/ISSUE_CUSTOMER_REFUND";
@@ -158,11 +166,22 @@ export interface ScenarioTrace {
   reversibility: string;
 }
 
+export interface PersistenceStatus {
+  configured: boolean;
+  runId: string;
+  persistedThisRun: number;
+  persistError: string | null;
+  totalPersistedEvents: number | null;
+  totalPersistedAgents: number | null;
+  recentRuns: PersistedRunSummary[];
+}
+
 export interface BenchmarkSuiteResult {
   runAt: string;
   scenarios: ScenarioTrace[];
   metrics: ResearchMetrics;
   totalLedgerEvents: number;
+  persistence: PersistenceStatus;
 }
 
 /**
@@ -170,7 +189,7 @@ export interface BenchmarkSuiteResult {
  * (identify -> assess -> decide -> grant -> execute -> observe -> learn)
  * against one shared ledger, then computes SPEC-018 metrics over it.
  */
-export function runBenchmarkSuite(): BenchmarkSuiteResult {
+export async function runBenchmarkSuite(): Promise<BenchmarkSuiteResult> {
   const clock = new ManualClock("2026-07-05T00:00:00.000Z");
   const ids = new SequentialIds();
   const ledger = new EventLedger(clock, ids);
@@ -321,5 +340,39 @@ export function runBenchmarkSuite(): BenchmarkSuiteResult {
     ledgerRange: { tenantId: BENCHMARK_TENANT_ID, fromEventCount: 0, toEventCount: ledger.size },
   });
 
-  return { runAt: clock.now(), scenarios, metrics, totalLedgerEvents: ledger.size };
+  // Persist this run to Postgres (SPEC-014 durable mirror, see
+  // persistence/supabase-store.ts). A no-op when SUPABASE_URL/KEY
+  // aren't configured -- local dev and tests never require a database.
+  const runId = randomUUID();
+  let persistedThisRun = 0;
+  let persistError: string | null = null;
+  if (isPersistenceConfigured()) {
+    try {
+      const persistResult = await persistEvents(ledger.eventsForTenant(BENCHMARK_TENANT_ID), runId);
+      persistedThisRun = persistResult.persisted;
+      persistError = persistResult.error;
+      await persistAgent(agent, version, instance);
+    } catch (err) {
+      persistError = err instanceof Error ? err.message : String(err);
+    }
+  }
+  const [totalPersistedEvents, totalPersistedAgents, recent] = isPersistenceConfigured()
+    ? await Promise.all([totalPersistedEventCount(), totalPersistedAgentCount(), recentRuns(6)])
+    : [null, null, []];
+
+  return {
+    runAt: clock.now(),
+    scenarios,
+    metrics,
+    totalLedgerEvents: ledger.size,
+    persistence: {
+      configured: isPersistenceConfigured(),
+      runId,
+      persistedThisRun,
+      persistError,
+      totalPersistedEvents,
+      totalPersistedAgents,
+      recentRuns: recent,
+    },
+  };
 }

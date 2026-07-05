@@ -17,7 +17,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@aegis/contracts": "*"
+    "@aegis/contracts": "*",
+    "@supabase/supabase-js": "^2.110.0"
   },
   "devDependencies": {
     "@types/node": "^26.1.0",

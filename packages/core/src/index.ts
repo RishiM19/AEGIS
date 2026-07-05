@@ -17,3 +17,4 @@ export * from "./learning/learning-plane.js";
 export * from "./delegation/delegation-graph.js";
 export * from "./integrity/evidence-integrity.js";
 export * from "./research/benchmark-harness.js";
+export * from "./persistence/supabase-store.js";
