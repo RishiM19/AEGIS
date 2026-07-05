@@ -2,3 +2,8 @@ export * from "./kernel/clock.js";
 export * from "./ledger/event-ledger.js";
 export * from "./registry/algorithm-registry.js";
 export * from "./agents/agent-registry.js";
+export * from "./assessment/levels.js";
+export * from "./assessment/competence.js";
+export * from "./assessment/novelty.js";
+export * from "./assessment/epistemic.js";
+export * from "./assessment/consequence.js";
