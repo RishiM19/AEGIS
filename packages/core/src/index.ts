@@ -8,3 +8,5 @@ export * from "./assessment/novelty.js";
 export * from "./assessment/epistemic.js";
 export * from "./assessment/consequence.js";
 export * from "./autonomy/decision-engine.js";
+export * from "./execution/enablement.js";
+export * from "./execution/gateway.js";
