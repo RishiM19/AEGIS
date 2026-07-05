@@ -1,4 +1,5 @@
 import { runBenchmarkSuite, type ScenarioTrace } from "@/lib/run-benchmark";
+import { IncidentPanel } from "./components/IncidentPanel";
 import type { CeilingBreakdown } from "@aegis/core";
 
 export const dynamic = "force-dynamic";
@@ -147,6 +148,11 @@ export default function Page() {
           <Scenario key={s.scenario.scenarioId} trace={s} />
         ))}
       </div>
+
+      <div className="section-title" style={{ marginTop: 40 }}>
+        Runtime Sentinel — live incident
+      </div>
+      <IncidentPanel />
 
       <p className="footer-note">
         Autonomy ceiling is the strict minimum across authority, competence, novelty, epistemic, and
