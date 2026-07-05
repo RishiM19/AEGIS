@@ -11,3 +11,4 @@ export * from "./autonomy/decision-engine.js";
 export * from "./execution/enablement.js";
 export * from "./execution/gateway.js";
 export * from "./sentinel/runtime-sentinel.js";
+export * from "./recovery/recovery-engine.js";
