@@ -1,5 +1,7 @@
 import { runBenchmarkSuite, type ScenarioTrace } from "@/lib/run-benchmark";
+import { runBaselineComparison } from "@/lib/run-baselines";
 import { IncidentPanel } from "./components/IncidentPanel";
+import { BaselineChart } from "./components/BaselineChart";
 import type { CeilingBreakdown } from "@aegis/core";
 
 export const dynamic = "force-dynamic";
@@ -97,6 +99,7 @@ function Scenario({ trace }: { trace: ScenarioTrace }) {
 export default function Page() {
   const result = runBenchmarkSuite();
   const m = result.metrics;
+  const baselineComparison = runBaselineComparison();
 
   return (
     <main className="shell">
@@ -150,6 +153,11 @@ export default function Page() {
       </div>
 
       <div className="section-title" style={{ marginTop: 40 }}>
+        Governance model comparison — same scenarios, five configurations
+      </div>
+      <BaselineChart results={baselineComparison.results} />
+
+      <div className="section-title" style={{ marginTop: 8 }}>
         Runtime Sentinel — live incident
       </div>
       <IncidentPanel />

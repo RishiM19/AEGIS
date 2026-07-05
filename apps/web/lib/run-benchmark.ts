@@ -26,9 +26,32 @@ import {
 } from "@aegis/core";
 import { finalizeCanonicalAction, type CanonicalAction, type UnfingerprintedCanonicalAction } from "@aegis/contracts";
 
-const REGION = "finance.refunds.customer/ISSUE_CUSTOMER_REFUND";
+export const REGION = "finance.refunds.customer/ISSUE_CUSTOMER_REFUND";
 
-function buildRefundAction(scenario: RefundScenario, agentId: string, agentVersionId: string, createdAt: string): CanonicalAction {
+export function buildStrongEvidence(agentVersionId: string): CompetenceEvidenceInput[] {
+  return Array.from({ length: 40 }, (_, i) => ({
+    evidenceItemId: `ce_${i}`,
+    agentVersionId,
+    actionRegion: REGION,
+    outcomeScore: 1,
+    evidenceWeight: 1,
+    fromSimulation: false,
+    integrityScore: 1,
+    recordedAt: "2026-07-01T00:00:00.000Z",
+  }));
+}
+
+export function buildFamiliarHistory(agentId: string): HistoricalActionRecord[] {
+  return Array.from({ length: 10 }, (_, i) => ({
+    agentId,
+    actionRegion: REGION,
+    contextValues: { case_type: "duplicate_charge", payment_method: "card" },
+    monetaryMinor: 1000000 + i * 200000,
+    occurredAt: "2026-06-01T00:00:00.000Z",
+  }));
+}
+
+export function buildRefundAction(scenario: RefundScenario, agentId: string, agentVersionId: string, createdAt: string): CanonicalAction {
   const draft: UnfingerprintedCanonicalAction = {
     identity: {
       actionId: `act_${scenario.scenarioId}`,
@@ -187,23 +210,8 @@ export function runBenchmarkSuite(): BenchmarkSuiteResult {
   const instance = agents.startRuntimeInstance(version.agentVersionId, "vercel-demo", "secret");
   const identity = agents.resolveVerifiedIdentity(instance.runtimeInstanceId, "secret");
 
-  const strongEvidence: CompetenceEvidenceInput[] = Array.from({ length: 40 }, (_, i) => ({
-    evidenceItemId: `ce_${i}`,
-    agentVersionId: version.agentVersionId,
-    actionRegion: REGION,
-    outcomeScore: 1,
-    evidenceWeight: 1,
-    fromSimulation: false,
-    integrityScore: 1,
-    recordedAt: "2026-07-01T00:00:00.000Z",
-  }));
-  const familiarHistory: HistoricalActionRecord[] = Array.from({ length: 10 }, (_, i) => ({
-    agentId: agent.agentId,
-    actionRegion: REGION,
-    contextValues: { case_type: "duplicate_charge", payment_method: "card" },
-    monetaryMinor: 1000000 + i * 200000,
-    occurredAt: "2026-06-01T00:00:00.000Z",
-  }));
+  const strongEvidence = buildStrongEvidence(version.agentVersionId);
+  const familiarHistory = buildFamiliarHistory(agent.agentId);
 
   // Only the first scenario's amount is "familiar"; the others are
   // deliberately outside/absent delegation scope so the dashboard shows
