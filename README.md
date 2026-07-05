@@ -3,6 +3,7 @@
 **Adaptive Autonomy Infrastructure for AI Agents**
 
 [![CI](https://github.com/RishiM19/AEGIS/actions/workflows/ci.yml/badge.svg)](https://github.com/RishiM19/AEGIS/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-139%20passing-34d399)](https://github.com/RishiM19/AEGIS/actions/workflows/ci.yml)
 [![Live dashboard](https://img.shields.io/badge/live%20demo-aegis--dashboard-4da3ff)](https://aegis-dashboard-woad.vercel.app)
 
 Most AI-agent safety today is a static permission check: *is this identity allowed to call this tool?* AEGIS asks a harder question instead — *given this exact action, this agent's actual track record, how novel the situation is, how bad it could go, and whether it can be undone, how much independence should this agent get, right now?* It's the difference between a firewall rule and a judgment call, made automatically, consistently, and auditably, thousands of times a second.
